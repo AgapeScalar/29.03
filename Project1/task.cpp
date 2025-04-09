@@ -1,6 +1,4 @@
 #include <iostream>
-#include <numeric>  
-
 using namespace std;
 
 class Fraction {
@@ -8,98 +6,96 @@ private:
     int numerator;   
     int denominator; 
 
-    void reduce() {
-        int gcd = gcd(numerator, denominator); 
-        numerator /= gcd;
-        denominator /= gcd;
+    int gcd(int a, int b) {
+        return b == 0 ? a : gcd(b, a % b);
+    }
 
-        if (denominator < 0) {
-            numerator *= -1;
-            denominator *= -1;
+    void simplify() {
+        int g = gcd(abs(numerator), abs(denominator));
+        numerator /= g;
+        denominator /= g;
+        if (denominator < 0) { 
+            numerator = -numerator;
+            denominator = -denominator;
         }
     }
 
 public:
+    Fraction() : numerator(0), denominator(1) {}
+
+    Fraction(int num, int den) {
+        numerator = num;
+        denominator = den == 0 ? 1 : den; 
+        simplify();
+    }
+
     void input() {
         cout << "Введіть чисельник: ";
         cin >> numerator;
         cout << "Введіть знаменник: ";
         cin >> denominator;
-
         if (denominator == 0) {
-            cerr << "Знаменник не може бути нульовим! Встановлено 1.\n";
+            cout << "Знаменник не може бути нулем. Встановлено 1 за замовчуванням.\n";
             denominator = 1;
         }
-
-        reduce();
+        simplify();
     }
 
     void print() const {
-        cout << numerator << "/" << denominator << "\n";
+        cout << numerator << "/" << denominator << endl;
     }
 
     Fraction add(const Fraction& other) const {
-        Fraction result;
-        result.numerator = numerator * other.denominator + other.numerator * denominator;
-        result.denominator = denominator * other.denominator;
-        result.reduce();
-        return result;
+        int num = numerator * other.denominator + other.numerator * denominator;
+        int den = denominator * other.denominator;
+        return Fraction(num, den);
     }
 
     Fraction subtract(const Fraction& other) const {
-        Fraction result;
-        result.numerator = numerator * other.denominator - other.numerator * denominator;
-        result.denominator = denominator * other.denominator;
-        result.reduce();
-        return result;
+        int num = numerator * other.denominator - other.numerator * denominator;
+        int den = denominator * other.denominator;
+        return Fraction(num, den);
     }
 
     Fraction multiply(const Fraction& other) const {
-        Fraction result;
-        result.numerator = numerator * other.numerator;
-        result.denominator = denominator * other.denominator;
-        result.reduce();
-        return result;
+        int num = numerator * other.numerator;
+        int den = denominator * other.denominator;
+        return Fraction(num, den);
     }
 
     Fraction divide(const Fraction& other) const {
-        Fraction result;
-        if (other.numerator == 0) {
-            cerr << "Помилка: ділення на нуль!\n";
-            result.numerator = 0;
-            result.denominator = 1;
-        }
-        else {
-            result.numerator = numerator * other.denominator;
-            result.denominator = denominator * other.numerator;
-            result.reduce();
-        }
-        return result;
+        int num = numerator * other.denominator;
+        int den = denominator * other.numerator;
+        return Fraction(num, den);
     }
 };
 
 int main() {
-    Fraction f1, f2;
+    Fraction a, b;
 
-    cout << "Введіть перший дріб:\n";
-    f1.input();
+    cout << "Введення першого дробу:\n";
+    a.input();
 
-    cout << "Введіть другий дріб:\n";
-    f2.input();
+    cout << "Введення другого дробу:\n";
+    b.input();
 
-    cout << "\nРезультати операцій:\n";
+    Fraction sum = a.add(b);
+    Fraction diff = a.subtract(b);
+    Fraction prod = a.multiply(b);
+    Fraction quot = a.divide(b);
 
+    cout << "\nРезультати:\n";
     cout << "Сума: ";
-    f1.add(f2).print();
+    sum.print();
 
     cout << "Різниця: ";
-    f1.subtract(f2).print();
+    diff.print();
 
     cout << "Добуток: ";
-    f1.multiply(f2).print();
+    prod.print();
 
     cout << "Частка: ";
-    f1.divide(f2).print();
+    quot.print();
 
     return 0;
 }
